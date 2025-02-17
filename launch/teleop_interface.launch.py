@@ -32,7 +32,7 @@ def generate_launch_description():
     mode_manager_node = Node(
         package="ur10_interface",
         executable="mode_manager.py",
-        output="screen",
+        output="log",
         parameters=[
             moveit_config.to_dict(),
             {'use_sim_time': True}, # to match time stamp of "/joint_states" topic with gazebo
@@ -45,6 +45,13 @@ def generate_launch_description():
         output="screen",
         arguments=['--env', 'gazebo'], # to load environment specific config file
     )
+    
+    target_pose_node = Node(
+        package="ur10_interface",
+        executable="target_pose.py",
+        output="screen",
+        arguments=['--env', 'gazebo'], # to load environment specific config file
+    )
 
     return LaunchDescription([
         SetParameter(name='use_sim_time', value=True), # set "use_sim_time" to true for all instances in the launch file
@@ -52,4 +59,5 @@ def generate_launch_description():
         input_node,
         mode_manager_node,
         delta_input_node,
+        target_pose_node,
     ])

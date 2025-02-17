@@ -1,6 +1,38 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*- 
-from ur10_interface.common_utils import *
+# from ur10_interface.common_utils import *
+import argparse
+import yaml
+import os
+import time
+import numpy as np
+import copy
+
+from ament_index_python.packages import get_package_share_directory
+
+def get_package_dir(package_name):
+    share_dir = get_package_share_directory(package_name)
+    package_dir = share_dir.replace('install', 'src').removesuffix(f'/share/{package_name}')
+    return package_dir
+
+# mode
+INIT = 0
+TELEOP = 1
+TASK_CONTROL = 2
+JOINT_CONTROL = 3
+AI = 4
+MOVEIT = 5
+IDLE = 6
+
+mode_dict = {
+    0: "INIT",
+    1: "TELEOP",
+    2: "TASK_CONTROL",
+    3: "JOINT_CONTROL",
+    4: "AI",
+    5: "MOVEIT",
+    6: "IDLE",
+}
 
 # ROS2 library
 import rclpy
@@ -71,7 +103,7 @@ class ModeManager(Node):
         self.list_controller_client = self.create_client(ListControllers, '/controller_manager/list_controllers')
         
         # initialize pose
-        self.move_to_config_pose('init', sleep_time=5.0)
+        self.move_to_config_pose('init', sleep_time=3.0)
         
         # mode loop
         self.timer = self.create_timer(0.001, self.loop)
@@ -106,6 +138,7 @@ class ModeManager(Node):
         
         # if mode changed
         if mode is not self.mode:
+            self.get_logger().info(f"Mode changed from {mode_dict[self.mode]} to {mode_dict[mode]}")
             # switch controller interface
             if mode in [INIT, MOVEIT]:
                 #conlist = self.get_active_controllers()
@@ -120,11 +153,10 @@ class ModeManager(Node):
             
             # update mode
             self.mode = mode
-            print(f"Current mode: {mode_dict[self.mode]}")
         
         self.mode_pub.publish(Int32(data=self.mode))
         
-    def move_to_config_pose(self, config_pose, sleep_time=2.0):
+    def move_to_config_pose(self, config_pose, sleep_time=1.0):
         assert config_pose in ['up', 'init', 'ready'], f"Invalid pose {config_pose}"
         self.ur10_arm.set_start_state_to_current_state()
         self.ur10_arm.set_goal_state(configuration_name=config_pose)

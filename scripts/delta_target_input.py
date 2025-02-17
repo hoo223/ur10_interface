@@ -1,6 +1,38 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*- 
-from ur10_interface.common_utils import *
+# from ur10_interface.common_utils import *
+import argparse
+import yaml
+import os
+import time
+import numpy as np
+import copy
+
+from ament_index_python.packages import get_package_share_directory
+
+def get_package_dir(package_name):
+    share_dir = get_package_share_directory(package_name)
+    package_dir = share_dir.replace('install', 'src').removesuffix(f'/share/{package_name}')
+    return package_dir
+
+# mode
+INIT = 0
+TELEOP = 1
+TASK_CONTROL = 2
+JOINT_CONTROL = 3
+AI = 4
+MOVEIT = 5
+IDLE = 6
+
+mode_dict = {
+    0: "INIT",
+    1: "TELEOP",
+    2: "TASK_CONTROL",
+    3: "JOINT_CONTROL",
+    4: "AI",
+    5: "MOVEIT",
+    6: "IDLE",
+}
 
 # ROS2 library
 import rclpy
@@ -21,6 +53,7 @@ class DeltaTargetInput(Node):
         self.init_joint_states = self.config["init_joint_states"]
         self.input_pos_gain = self.config["input_pos_gain"]
         self.input_ori_gain = self.config["input_ori_gain"]
+        self.mode = self.config["mode"]
 
         # teleoperation variable
         self.pre_button = None
@@ -102,16 +135,15 @@ class DeltaTargetInput(Node):
     def loop(self):
         # access mode from parameter server
         mode = self.mode
-        self.get_logger().info(f"Current mode: {mode_dict[mode]}")
+        # self.get_logger().info(f"Current mode: {mode_dict[mode]}")
         delta_target_input = Float64MultiArray()
         if mode == TELEOP:
             # generate delta target input from joystick and keyboard command
             delta_target_joystick = self.input_conversion(self.joystick_command)
             delta_target_keyboard = self.input_conversion(self.keyboard_command)
             # combine joystick and keyboard input
-            delta_target_input.data = [
-                delta_target_joystick[i] + delta_target_keyboard[i] for i in range(6)
-            ]
+            for i in range(6):
+                delta_target_input.data.append(delta_target_joystick[i] + delta_target_keyboard[i]) 
         elif mode == AI:
             # generate delta target input from ai command
             delta_target_ai = self.input_conversion(self.ai_command)

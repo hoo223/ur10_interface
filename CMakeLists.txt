@@ -18,6 +18,7 @@ find_package(moveit_ros_planning_interface REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+# find_package(tf_transformations REQUIRED)
 find_package(moveit_py REQUIRED)
 find_package(ament_cmake_python REQUIRED) # for python scripts
 find_package(rosidl_default_generators REQUIRED) # for custom message generation
@@ -36,7 +37,7 @@ install(TARGETS
 )
 
 # install python modules
-#ament_python_install_package(${PROJECT_NAME}) # rosidl_generate_interfaces에서 중복 발생
+# ament_python_install_package(${PROJECT_NAME}) # rosidl_generate_interfaces에서 중복 발생
 
 # install python executables
 install(PROGRAMS
@@ -65,6 +66,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SolveIk.srv"
   DEPENDENCIES std_msgs geometry_msgs
 )
+
+ament_export_dependencies(rosidl_default_runtime)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
