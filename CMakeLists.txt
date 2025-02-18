@@ -7,37 +7,51 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED) # for python scripts
 find_package(rclpy REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(tutorial_interfaces REQUIRED) # for custom messages
 find_package(interactive_markers REQUIRED)
+find_package(moveit_core REQUIRED)
+find_package(moveit_ros_planning REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
+find_package(moveit_msgs REQUIRED)
+find_package(moveit_visual_tools REQUIRED)
+# find_package(moveit_task_constructor_core REQUIRED)
+# find_package(moveit_servo REQUIRED)
+find_package(moveit_py REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(tf2_eigen REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-# find_package(tf_transformations REQUIRED)
-find_package(moveit_py REQUIRED)
-find_package(ament_cmake_python REQUIRED) # for python scripts
-find_package(rosidl_default_generators REQUIRED) # for custom message generation
+
 
 # include cpp "include" directory
 include_directories(include)
 
 # create cpp executable
-add_executable(talker src/talker_cpp.cpp)
-ament_target_dependencies(talker rclcpp std_msgs)
+# add_executable(talker src/talker_cpp.cpp)
+# ament_target_dependencies(talker rclcpp std_msgs)
+add_executable(task2joint src/task2joint.cpp)
+ament_target_dependencies(task2joint rclcpp std_msgs moveit_ros_planning_interface tutorial_interfaces)
+add_executable(moveit_cpp_interface_example src/moveit_cpp_interface_example.cpp)
+ament_target_dependencies(moveit_cpp_interface_example rclcpp std_msgs moveit_ros_planning_interface tutorial_interfaces)
 
 # install cpp executable
-install(TARGETS
-  talker
-  DESTINATION lib/${PROJECT_NAME}
-)
+# install(TARGETS talker
+#   DESTINATION lib/${PROJECT_NAME})
+install(TARGETS task2joint
+  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS moveit_cpp_interface_example
+  DESTINATION lib/${PROJECT_NAME})
 
 # install python modules
-# ament_python_install_package(${PROJECT_NAME}) # rosidl_generate_interfaces에서 중복 발생
+ament_python_install_package(${PROJECT_NAME}) # rosidl_generate_interfaces에서 중복 발생
 
 # install python executables
 install(PROGRAMS
@@ -59,16 +73,6 @@ install(DIRECTORY
 install(DIRECTORY config/
   DESTINATION share/${PROJECT_NAME}/config
 )
-
-# Add custom service message
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "srv/SetTargetPose.srv"
-  "srv/SolveIk.srv"
-  DEPENDENCIES std_msgs geometry_msgs
-)
-
-ament_export_dependencies(rosidl_default_runtime)
-
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

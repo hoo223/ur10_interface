@@ -77,7 +77,7 @@ class DeltaTargetInput(Node):
         
     def load_parameters_from_config(self, args):
         # config 파일 로드
-        config_path = os.path.join(get_package_dir("ur10_python_interface"), 'config', f"config_{args.env}.yaml")
+        config_path = os.path.join(get_package_dir("ur10_interface"), 'config', f"config_{args.env}.yaml")
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
 

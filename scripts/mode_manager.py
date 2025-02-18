@@ -110,7 +110,7 @@ class ModeManager(Node):
         
     def load_parameters_from_config(self, args):
         # config 파일 로드
-        config_path = os.path.join(get_package_dir("ur10_python_interface"), 'config', f"config_{args.env}.yaml")
+        config_path = os.path.join(get_package_dir("ur10_interface"), 'config', f"config_{args.env}.yaml")
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
 
@@ -135,6 +135,7 @@ class ModeManager(Node):
             self.set_parameters([rclpy.parameter.Parameter('mode', rclpy.Parameter.Type.INTEGER, TELEOP)])
         # read current mode
         mode = self.get_parameter('mode').get_parameter_value().integer_value
+        self.mode_pub.publish(Int32(data=mode))
         
         # if mode changed
         if mode is not self.mode:
@@ -154,7 +155,7 @@ class ModeManager(Node):
             # update mode
             self.mode = mode
         
-        self.mode_pub.publish(Int32(data=self.mode))
+        
         
     def move_to_config_pose(self, config_pose, sleep_time=1.0):
         assert config_pose in ['up', 'init', 'ready'], f"Invalid pose {config_pose}"

@@ -27,7 +27,7 @@ def generate_launch_description():
     input_node = Node(
         package="ur10_interface",
         executable="input_command.py",
-        output="log",
+        output="screen",
     )
     mode_manager_node = Node(
         package="ur10_interface",
@@ -42,15 +42,22 @@ def generate_launch_description():
     delta_input_node = Node(
         package="ur10_interface",
         executable="delta_target_input.py",
-        output="screen",
+        output="log",
         arguments=['--env', 'gazebo'], # to load environment specific config file
     )
     
     target_pose_node = Node(
         package="ur10_interface",
         executable="target_pose.py",
-        output="screen",
+        output="log",
         arguments=['--env', 'gazebo'], # to load environment specific config file
+    )
+    
+    task2joint_node = Node(
+        package="ur10_interface",
+        executable="task2joint",
+        output="screen",
+        parameters=[moveit_config.to_dict()],
     )
 
     return LaunchDescription([
@@ -60,4 +67,5 @@ def generate_launch_description():
         mode_manager_node,
         delta_input_node,
         target_pose_node,
+        task2joint_node,
     ])

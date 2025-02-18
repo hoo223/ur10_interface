@@ -40,7 +40,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Quaternion, PoseStamped
 from std_msgs.msg import Float64MultiArray, Int32
 from std_srvs.srv import Trigger
-from ur10_interface.srv import SetTargetPose
+from tutorial_interfaces.srv import SetTargetPose
 from tf_transformations import quaternion_from_euler
 
 
@@ -82,7 +82,7 @@ class TargetPose(Node):
         
     def load_parameters_from_config(self, args):
         # config 파일 로드
-        config_path = os.path.join(get_package_dir("ur10_python_interface"), 'config', f"config_{args.env}.yaml")
+        config_path = os.path.join(get_package_dir("ur10_interface"), 'config', f"config_{args.env}.yaml")
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
 

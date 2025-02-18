@@ -1,4 +1,0 @@
-geometry_msgs/Pose end_pose
----
-std_msgs/Float64MultiArray ik_result
-bool success
