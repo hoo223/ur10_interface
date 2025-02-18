@@ -27,7 +27,7 @@ def generate_launch_description():
     input_node = Node(
         package="ur10_interface",
         executable="input_command.py",
-        output="screen",
+        output="log",
     )
     mode_manager_node = Node(
         package="ur10_interface",
@@ -56,8 +56,14 @@ def generate_launch_description():
     task2joint_node = Node(
         package="ur10_interface",
         executable="task2joint",
-        output="screen",
+        output="log",
         parameters=[moveit_config.to_dict()],
+    )
+    
+    teleop_controller_node = Node(
+        package="ur10_interface",
+        executable="teleop_controller.py",
+        output="log",
     )
 
     return LaunchDescription([
@@ -68,4 +74,5 @@ def generate_launch_description():
         delta_input_node,
         target_pose_node,
         task2joint_node,
+        teleop_controller_node
     ])
