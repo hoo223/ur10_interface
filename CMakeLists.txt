@@ -22,8 +22,6 @@ find_package(moveit_ros_planning REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
 find_package(moveit_msgs REQUIRED)
 find_package(moveit_visual_tools REQUIRED)
-# find_package(moveit_task_constructor_core REQUIRED)
-# find_package(moveit_servo REQUIRED)
 find_package(moveit_py REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -60,6 +58,8 @@ install(PROGRAMS
   scripts/mode_manager.py
   scripts/delta_target_input.py
   scripts/target_pose.py
+  scripts/teleop_controller.py
+  scripts/visualize_target_pose.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

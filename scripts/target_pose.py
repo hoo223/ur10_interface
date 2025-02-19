@@ -38,7 +38,7 @@ mode_dict = {
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Quaternion, PoseStamped
-from std_msgs.msg import Float64MultiArray, Int32
+from std_msgs.msg import Float64MultiArray, Int32, Bool
 from std_srvs.srv import Trigger
 from tutorial_interfaces.srv import SetTargetPose
 from tf_transformations import quaternion_from_euler
@@ -48,37 +48,46 @@ class TargetPose(Node):
     def __init__(self, args):
         super().__init__('target_pose_node')
         
-        # load parameters
+        # Load parameters
         self.load_parameters_from_config(args)
 
-        # initialize
+        # Initialize
         self.prefix = args.prefix
         self.env = self.config["env"]
         self.init_pose = self.config["init_pose"]
         self.mode = self.config["mode"]
         self.current_mode = self.mode
-
-        # Initialize pose
         self.target_pose = copy.deepcopy(self.init_pose)
-
+        self.last_success_target_pose = copy.deepcopy(self.init_pose)
         self.delta_target_input = [0.0] * 6
-        self.delta_target_haptic = [0.0] * 6
+        self.ik_success = False
+        self.target_pose_msg = self.update_target_pose()
 
-        # Subscribers
-        self.create_subscription(Float64MultiArray, 'delta_target_input', self.delta_target_input_callback, 10)
-        # self.create_subscription(Float64MultiArray, 'delta_target_haptic', self.delta_target_haptic_callback, 10)
-        # self.create_subscription(Float64MultiArray, 'haptic_target_pose', self.haptic_target_pose_callback, 10)
-        self.create_subscription(Int32, 'mode', self.mode_callback, 10)
-
-        # Publisher
+        # Publishers & Subscribers
         self.target_pose_pub = self.create_publisher(PoseStamped, "target_pose", 10)
-
-        # Services
+        self.create_subscription(Float64MultiArray, 'delta_target_input', self.delta_target_input_callback, 10)
+        self.create_subscription(Int32, 'mode', self.mode_callback, 10)
+        self.create_subscription(Bool, 'ik_success', self.ik_success_callback, 10)
+        
+        # Services & Clients
         self.create_service(Trigger, 'reset_target_pose', self.reset_target_pose)
         self.create_service(SetTargetPose, 'set_target_pose', self.set_target_pose)
 
         # Timer
         self.timer = self.create_timer(1.0 / 250, self.loop)
+        
+    def loop(self):
+        mode = self.mode
+        if mode == INIT:
+            self.target_pose = copy.deepcopy(self.init_pose)
+            if self.current_mode != mode: self.get_logger().info("Target pose initialized")
+        elif mode in [TELEOP, AI]:
+            self.target_pose_msg = self.update_target_pose()
+            self.target_pose_pub.publish(self.target_pose_msg)
+            # if self.ik_success:
+            #     self.last_success_target_pose = self.target_pose
+            if self.current_mode != mode: self.get_logger().info("Target pose calculated and published")
+        self.current_mode = mode
         
     def load_parameters_from_config(self, args):
         # config 파일 로드
@@ -97,6 +106,8 @@ class TargetPose(Node):
             self.delta_target_input = [0.0] * 6
             
         # add delta to target pose
+        # if not self.ik_success:
+        #     self.target_pose = copy.deepcopy(self.last_success_target_pose)         
         for i in range(6):
             self.target_pose[i] += self.delta_target_input[i]
 
@@ -113,7 +124,7 @@ class TargetPose(Node):
         ps.pose.position.z = self.target_pose[2]
         ps.pose.orientation = target_orientation
 
-        self.target_pose_msg = ps
+        return ps
 
     def reset_target_pose(self, request, response):
         self.target_pose = copy.deepcopy(self.init_pose)
@@ -128,26 +139,12 @@ class TargetPose(Node):
 
     def delta_target_input_callback(self, msg):
         self.delta_target_input = msg.data.tolist()
-
-    def delta_target_haptic_callback(self, msg):
-        self.delta_target_haptic = msg.data.tolist()
-
-    def haptic_target_pose_callback(self, msg):
-        self.target_pose[:3] = msg.data.tolist()[:3]
-
-    def loop(self):
-        mode = self.mode
-        if mode == INIT:
-            self.target_pose = copy.deepcopy(self.init_pose)
-            if self.current_mode != mode: self.get_logger().info("Target pose initialized")
-        elif mode in [TELEOP, AI]:
-            self.update_target_pose()
-            self.target_pose_pub.publish(self.target_pose_msg)
-            if self.current_mode != mode: self.get_logger().info("Target pose calculated and published")
-        self.current_mode = mode
             
     def mode_callback(self, msg):
         self.mode = msg.data
+        
+    def ik_success_callback(self, msg):
+        self.ik_success = msg.data
 
 
 def main(args=None):

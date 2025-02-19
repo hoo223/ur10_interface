@@ -9,7 +9,6 @@ from launch_ros.actions import Node, SetParameter
 from moveit_configs_utils import MoveItConfigsBuilder
 from moveit_configs_utils.launches import generate_move_group_launch
 
-
 def generate_launch_description():
     ## MoveIt settings
     moveit_config = (
@@ -56,13 +55,19 @@ def generate_launch_description():
     task2joint_node = Node(
         package="ur10_interface",
         executable="task2joint",
-        output="log",
+        output="screen",
         parameters=[moveit_config.to_dict()],
     )
     
     teleop_controller_node = Node(
         package="ur10_interface",
         executable="teleop_controller.py",
+        output="log",
+    )
+    
+    visualize_target_pose_node = Node(
+        package="ur10_interface",
+        executable="visualize_target_pose.py",
         output="log",
     )
 
@@ -74,5 +79,6 @@ def generate_launch_description():
         delta_input_node,
         target_pose_node,
         task2joint_node,
-        teleop_controller_node
+        teleop_controller_node,
+        visualize_target_pose_node,
     ])

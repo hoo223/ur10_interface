@@ -97,54 +97,36 @@ class InputPublisher(Node):
                     sys.exit()
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]:
-            self.human_agent_action[0] = 1.0
-        elif keys[pygame.K_s]:
-            self.human_agent_action[0] = -1.0
-        else:
-            self.human_agent_action[0] = 0.0
-            
-        if keys[pygame.K_a]:
-            self.human_agent_action[1] = -1.0
-        elif keys[pygame.K_d]:
-            self.human_agent_action[1] = 1.0
-        else:
-            self.human_agent_action[1] = 0.0
-            
-        if keys[pygame.K_e]:
-            self.human_agent_action[2] = 1.0
-        elif keys[pygame.K_c]:
-            self.human_agent_action[2] = -1.0
-        else:
-            self.human_agent_action[2] = 0.0
-            
-        if keys[pygame.K_f]:
-            self.human_agent_action[3] = 1.0
-        elif keys[pygame.K_h]:
-            self.human_agent_action[3] = -1.0
-        else:
-            self.human_agent_action[3] = 0.0
-            
-        if keys[pygame.K_t]:
-            self.human_agent_action[4] = 1.0
-        elif keys[pygame.K_g]:
-            self.human_agent_action[4] = -1.0
-        else:
-            self.human_agent_action[4] = 0.0
-            
-        if keys[pygame.K_r]:
-            self.human_agent_action[5] = 1.0
-        elif keys[pygame.K_y]:
-            self.human_agent_action[5] = -1.0
-        else:
-            self.human_agent_action[5] = 0.0
-            
-        if keys[pygame.K_1]:
-            self.button[0] = 6.0 # init mode
-        elif keys[pygame.K_2]:
-            self.button[0] = 7.0 # teleop mode
-        else:
-            self.button[0] = -1.0
+        # Position axis 1 - lateral
+        if    keys[pygame.K_a]: self.human_agent_action[0] = 1.0
+        elif  keys[pygame.K_d]: self.human_agent_action[0] = -1.0
+        else:                   self.human_agent_action[0] = 0.0
+        # Position axis 2 - forward
+        if    keys[pygame.K_s]: self.human_agent_action[1] = -1.0
+        elif  keys[pygame.K_w]: self.human_agent_action[1] = 1.0
+        else:                   self.human_agent_action[1] = 0.0
+        # Position axis 3 - up
+        if    keys[pygame.K_e]: self.human_agent_action[2] = 1.0
+        elif  keys[pygame.K_c]: self.human_agent_action[2] = -1.0
+        else:                   self.human_agent_action[2] = 0.0
+        # Orientation axis 1 - roll
+        if    keys[pygame.K_t]: self.human_agent_action[3] = 1.0
+        elif  keys[pygame.K_g]: self.human_agent_action[3] = -1.0
+        else:                   self.human_agent_action[3] = 0.0
+        # Orientation axis 2 - pitch
+        if    keys[pygame.K_r]: self.human_agent_action[4] = 1.0
+        elif  keys[pygame.K_y]: self.human_agent_action[4] = -1.0
+        else:                   self.human_agent_action[4] = 0.0
+        # Orientation axis 3 - yaw
+        if    keys[pygame.K_f]: self.human_agent_action[5] = 1.0
+        elif  keys[pygame.K_h]: self.human_agent_action[5] = -1.0
+        else:                   self.human_agent_action[5] = 0.0
+        # Mode and speed
+        if    keys[pygame.K_1]: self.button[0] = 6.0 # init mode
+        elif  keys[pygame.K_2]: self.button[0] = 7.0 # teleop mode
+        elif  keys[pygame.K_x]: self.button[0] = 5.0 # speed up
+        elif  keys[pygame.K_z]: self.button[0] = 4.0 # speed down
+        else:                   self.button[0] = -1.0
         
         return self.human_agent_action, self.button  
 
