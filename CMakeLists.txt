@@ -28,24 +28,21 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_eigen REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 
-
 # include cpp "include" directory
 include_directories(include)
 
 # create cpp executable
-# add_executable(talker src/talker_cpp.cpp)
-# ament_target_dependencies(talker rclcpp std_msgs)
 add_executable(task2joint src/task2joint.cpp)
 ament_target_dependencies(task2joint rclcpp std_msgs moveit_ros_planning_interface tutorial_interfaces)
-add_executable(moveit_cpp_interface_example src/moveit_cpp_interface_example.cpp)
-ament_target_dependencies(moveit_cpp_interface_example rclcpp std_msgs moveit_ros_planning_interface tutorial_interfaces)
+add_executable(task2joint_real src/task2joint_real.cpp)
+ament_target_dependencies(task2joint_real rclcpp std_msgs moveit_ros_planning_interface tutorial_interfaces)
 
 # install cpp executable
 # install(TARGETS talker
 #   DESTINATION lib/${PROJECT_NAME})
 install(TARGETS task2joint
   DESTINATION lib/${PROJECT_NAME})
-install(TARGETS moveit_cpp_interface_example
+install(TARGETS task2joint_real
   DESTINATION lib/${PROJECT_NAME})
 
 # install python modules
@@ -53,7 +50,6 @@ ament_python_install_package(${PROJECT_NAME}) # rosidl_generate_interfaces에서
 
 # install python executables
 install(PROGRAMS
-  scripts/listener_py.py
   scripts/input_command.py
   scripts/mode_manager.py
   scripts/delta_target_input.py

@@ -1,4 +1,4 @@
-env: "gazebo"
+env: "real"
 planning_group: "ur_manipulator"
 mode: 0 # INIT = 0 # TELEOP = 1 # TASK_CONTROL = 2 # JOINT_CONTROL = 3 # AI = 4 # MOVEIT = 5 # IDLE = 6
 haptic_feedback: false

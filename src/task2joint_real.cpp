@@ -119,13 +119,28 @@ private:
     int mode = INIT;
     double continuity_threshold = 0.3;
 
+    std::vector<double> convert_joint_order(std::vector<double> joint_values){
+        std::vector<double> converted_joint_values;
+        converted_joint_values.push_back(joint_values[5]);
+        converted_joint_values.push_back(joint_values[0]);
+        converted_joint_values.push_back(joint_values[1]);
+        converted_joint_values.push_back(joint_values[2]);
+        converted_joint_values.push_back(joint_values[3]);
+        converted_joint_values.push_back(joint_values[4]);
+        return converted_joint_values;
+    }
+
+
     // Callbacks
     void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) {
-        this->current_joint_state = *msg;
+        this->current_joint_state.position = convert_joint_order(msg->position);
+        this->current_joint_state.velocity = convert_joint_order(msg->velocity);
         this->current_joint_position = current_joint_state.position;
         this->current_joint_velocity = current_joint_state.velocity;
-        // RCLCPP_INFO(this->get_logger(), "I heard: '%s'", this->current_joint_state.name[0].c_str());
-        // RCLCPP_INFO(this->get_logger(), "I heard: '%f' '%f", this->current_joint_position[0], this->current_joint_velocity[0]);
+        // RCLCPP_INFO(this->get_logger(), "I heard: '%s %s %s %s %s %s'", this->current_joint_state.name[0].c_str(), this->current_joint_state.name[1].c_str(), this->current_joint_state.name[2].c_str(), this->current_joint_state.name[3].c_str(), this->current_joint_state.name[4].c_str(), this->current_joint_state.name[5].c_str());
+        // RCLCPP_INFO(this->get_logger(), "But I need: '%s %s %s %s %s %s'", joint_names[0].c_str(), joint_names[1].c_str(), joint_names[2].c_str(), joint_names[3].c_str(), joint_names[4].c_str(), joint_names[5].c_str());
+        // RCLCPP_INFO(this->get_logger(), "I heard: '%f %f %f %f %f %f'", this->current_joint_position[0], this->current_joint_position[1], this->current_joint_position[2], this->current_joint_position[3], this->current_joint_position[4], this->current_joint_position[5]);
+        // RCLCPP_INFO(this->get_logger(), "Converted joint values: '%f %f %f %f %f %f'", current_joint_position[0], current_joint_position[1], current_joint_position[2], current_joint_position[3], current_joint_position[4], current_joint_position[5]);
     }
 
     void target_pose_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg) {
@@ -154,6 +169,14 @@ private:
         {
             robot_state->copyJointGroupPositions(joint_model_group, ik_result);
             // RCLCPP_INFO(this->get_logger(), "found IK solution");
+            // update ik_result message
+            // ik_result.data.clear();
+            // ik_result.data.push_back(joint_values[0]);
+            // ik_result.data.push_back(joint_values[1]);
+            // ik_result.data.push_back(joint_values[2]);
+            // ik_result.data.push_back(joint_values[3]);
+            // ik_result.data.push_back(joint_values[4]);
+            // ik_result.data.push_back(joint_values[5]);
             
             // Check solution continuity
             bool continuity = check_solution_continuity();

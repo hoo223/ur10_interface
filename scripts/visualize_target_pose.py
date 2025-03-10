@@ -20,7 +20,7 @@ class TargetPoseMarker(Node):
         )
 
     def pose_callback(self, msg):
-        self.get_logger().info(f"Received Target Pose: x={msg.pose.position.x}, y={msg.pose.position.y}, z={msg.pose.position.z}")
+        # self.get_logger().info(f"Received Target Pose: x={msg.pose.position.x}, y={msg.pose.position.y}, z={msg.pose.position.z}")
 
         # Transform 메시지 생성
         transform = TransformStamped()
